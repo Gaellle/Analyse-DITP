@@ -56,30 +56,14 @@ def graphs_internet(departement):
 
     st.subheader('Taux de déploiement de la fibre')
     col1, col2  = st.columns(2)
-    col1.metric('National', str(round(df_1.progression_derniere_maj.mean()))+'%')
-    col2.metric('Départemental', str(round(df_dept.progression_derniere_maj.mean()))+'%')
+    col1.metric('National', str(round(df_1.valeur_actuelle.mean()))+'%')
+    col2.metric('Départemental', str(round(df_dept.valeur_actuelle.mean()))+'%')
     st.subheader('Taux de progression de la mesure 20/21')
     col3, col4  = st.columns(2)
     col3.metric('National', str(round(df_1.pourcentage_progression_derniere_maj.mean()))+'%')
     col4.metric('Départemental', str(round(df_dept.pourcentage_progression_derniere_maj.mean()))+'%')
 
-    # Indicateurs
-    fig1 = go.Figure()
-
-    fig1.add_trace(go.Indicator(
-        value = value3,
-        title = {'text': "Taux de progression 20/21"},
-        domain = {'row': 0, 'column': 0},
-        gauge_axis_range=[0,100]))
-
-    fig1.update_layout(
-        grid = {'rows': 1, 'columns': 2, 'pattern': "independent"},
-        template = {'data' : {'indicator': [{
-                                    'mode' : "number+gauge",
-                                    'delta' : {'reference': 90},
-                                    'number':{'suffix':'%'}}]},
-                                    })
-
+ 
     # lineplot
     st.subheader(f'Evolution du taux de déploiement de la fibre dans le département - {departement}')
 
@@ -91,7 +75,6 @@ def graphs_internet(departement):
     ax.set_ylabel("Taux de déploiement en '%' du territoire")
     ax.tick_params(axis='x', labelrotation=45)
 
-    st.plotly_chart(fig1)
     st.pyplot(fig3.figure)
 
     # ccl
@@ -117,7 +100,7 @@ def graphs_internet(departement):
 
     st.subheader("Répartition des départements en fonction du taux de couverture")
     st.pyplot(fig1.figure)
-    st.markdown ("Pour cette mesure, il semble que les départements qui avaient un certain retard concernant l'atteinte des objectifs nationaux ont tendance à progresser plus vite.")
+    st.markdown ("Pour cette mesure, il semble que les départements qui avaient un certain retard concernant l'atteinte des objectifs nationaux ont tendance à opérer un certain rattrapage.")
 
 
 def graphs_sante(departement):
@@ -160,10 +143,6 @@ def graphs_sante(departement):
     fig.add_trace(go.Indicator(
         value = value3,  title = {'text': "Progression pour les maisons de santé"},
         domain = {'row': 1, 'column': 0}, gauge_axis_range=[0,100]))
-
-    fig.add_trace(go.Indicator(
-        value = value4, title = {'text': " et les centres de santé"},
-        domain = {'row': 1, 'column': 1}, gauge_axis_range=[0,100]))
 
     fig.update_layout(
         grid = {'rows': 2, 'columns': 2, 'pattern': "independent"},
@@ -268,7 +247,7 @@ def graphs_velo(departement):
     st.pyplot(fig7.figure)
     ## Conclusion
 
-    st.markdown("On observe qu'entre 2020 et 2021, il y a d'avantage de disparité entre les départeents concernant le taux d'avancement. Cependant, c'est une évolution positive car il y a eu final d'avantage de départements à avoir atteint la cible et donc aussi moins de départements dans la tranche 80-95.")
+    st.markdown("On observe qu'entre 2020 et 2021, il y a d'avantage de disparité entre les départements concernant le taux d'avancement. Cependant, c'est une évolution positive car il y a eu final d'avantage de départements à avoir atteint la cible et donc aussi moins de départements dans la tranche 80-95.")
 
 
 def graphs_service(departement):
@@ -383,15 +362,18 @@ def graphs_handi(departement):
     fig13, ax = plt.subplots(figsize = (30,10))
     ax1 = plt.subplot(131)
     ax1 = sns.boxplot(data = df_5, y = "valeur_actuelle", color = 'red')
+    ax1.set_ylim([0,10])
     ax1.set_title("Actuellement")
 
     ax2 = plt.subplot(132)
     ax2 = sns.boxplot(data = df_5, y = "progression_derniere_maj", color = 'orangered')
+    ax2.set_ylim([0,10])
     ax2.set_title("En 2020")
 
     ax3 = plt.subplot(133)
     ax3 = sns.boxplot(data = df_5, y = "valeur_initiale", color = 'orange')
     ax3.set_title("En 2017 (ou année valeur initiale)")
+    ax3.set_ylim([0,10])
 
     st.subheader(f'Evolution temps de traitement des demandes AAH - {departement}')
     st.pyplot(fig11.figure)
