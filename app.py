@@ -41,17 +41,7 @@ st.header(reforme)
 # menu déroulant 'choix du departement'
 departement = st.selectbox('Sélectionnez un département', departements)
 
-def ccl_internet () :
-    # Affichage top progression
-    st.subheader('Départements avec le plus fort taux de progression récent et leur taux de couverture')
-    moy=df_1.pourcentage_progression_derniere_maj.mean()
-    top_progression = df_1[df_1['pourcentage_progression_derniere_maj']>moy].sort_values(by='pourcentage_progression_derniere_maj',ascending = False)\
-                  [['libelle_departement','pourcentage_progression_derniere_maj','valeur_actuelle']].reset_index(drop=True)
-
-    top_progression
-
-    st.markdown ("Pour cette mesure, il semble que les départements qui avaient un certain retard concernant l'atteinte des objectifs nationaux ont tendance à progresser plus vite.")
-
+    
 def graphs_internet(departement): 
     
     # Préparation des données
@@ -94,7 +84,7 @@ def graphs_internet(departement):
     st.subheader(f'Evolution du taux de déploiement de la fibre dans le département - {departement}')
 
     fig3, ax = plt.subplots(figsize = (15,10))
-    ax = sns.lineplot(data=df_det_dept, x = 'date', y = 'valeur', hue = 'code_departement', palette= 'magma')
+    ax = sns.lineplot(data=df_det_dept, x = 'date', y = 'valeur', palette= 'magma')
     ax = sns.lineplot(data = pd.DataFrame(detail_1.groupby(by='date').valeur.agg('mean')), x = 'date', y = 'valeur' )
     ax.legend([f'{departement}','moyenne nationale'])
     ax.set_xlabel('')
@@ -104,6 +94,30 @@ def graphs_internet(departement):
     st.plotly_chart(fig1)
     st.pyplot(fig3.figure)
 
+    # ccl
+    st.subheader('Départements avec le plus fort taux de progression récent et leur taux de couverture')
+    moy=df_1.pourcentage_progression_derniere_maj.mean()
+    top_progression = df_1[df_1['pourcentage_progression_derniere_maj']>moy].sort_values(by='pourcentage_progression_derniere_maj',ascending = False)\
+                  [['libelle_departement','pourcentage_progression_derniere_maj','valeur_actuelle']].reset_index(drop=True)
+
+    top_progression
+
+    fig1, ax = plt.subplots(figsize = (30,10))
+    ax1 = plt.subplot(131)
+    ax1 = sns.histplot(data = df_1, x = "valeur_actuelle", color = 'red', bins = 40)
+    ax1.set_title("Actuellement")
+
+    ax2 = plt.subplot(132)
+    ax2 = sns.histplot(data = df_1, x = "progression_derniere_maj", color = 'orangered', bins = 40)
+    ax2.set_title("En 2020")
+
+    ax3 = plt.subplot(133)
+    ax3 = sns.histplot(data = df_1, x = "valeur_initiale", color = 'orange', bins = 40)
+    ax3.set_title("En 2017")
+
+    st.subheader("Répartition des départements en fonction du taux de couverture")
+    st.pyplot(fig1.figure)
+    st.markdown ("Pour cette mesure, il semble que les départements qui avaient un certain retard concernant l'atteinte des objectifs nationaux ont tendance à progresser plus vite.")
 
 
 def graphs_sante(departement):
@@ -248,7 +262,7 @@ def graphs_velo(departement):
 
     st.subheader(f"Taux de d'avancement et de progression 20/21 de l'aménagement cyclable sécurisé - {departement}")
     st.plotly_chart(fig)
-    st.subheader("Kilomètres de réseau cyclabre sécurisés par rapport à la cible")
+    st.subheader("Kilomètres de réseau cyclable sécurisés par rapport à la cible")
     st.pyplot(fig6.figure)
     st.subheader("Histogramme du taux d'avancement par département")
     st.pyplot(fig7.figure)
@@ -352,15 +366,18 @@ def graphs_handi(departement):
 
     fig12, ax = plt.subplots(figsize = (30,10))
     ax1 = plt.subplot(131)
-    ax1 = sns.histplot(data = df_5, x = "valeur_actuelle", color = 'red')
+    ax1 = sns.histplot(data = df_5, x = "valeur_actuelle", color = 'red', bins = 20)
+    ax1.axvline(3, 0,30)
     ax1.set_title("Actuellement")
 
     ax2 = plt.subplot(132)
-    ax2 = sns.histplot(data = df_5, x = "progression_derniere_maj", color = 'orangered')
+    ax2 = sns.histplot(data = df_5, x = "progression_derniere_maj", color = 'orangered', bins = 20)
+    ax2.axvline(3, 0,30)
     ax2.set_title("En 2020")
 
     ax3 = plt.subplot(133)
-    ax3 = sns.histplot(data = df_5, x = "valeur_initiale", color = 'orange')
+    ax3 = sns.histplot(data = df_5, x = "valeur_initiale", color = 'orange', bins = 20)
+    ax3.axvline(3, 0,30)
     ax3.set_title("En 2017 (ou année valeur initiale)")
 
     fig13, ax = plt.subplots(figsize = (30,10))
@@ -388,7 +405,6 @@ def graphs_handi(departement):
 
 
 if reforme == 'Assurer une bonne couverture en internet fixe et en téléphonie mobile pour tous les Français d’ici 2022':
-    ccl_internet()
     graphs_internet(departement)
 elif reforme ==  'Doubler le nombre de maisons de santé et de centres de santé dans les territoires':
     graphs_sante(departement)
